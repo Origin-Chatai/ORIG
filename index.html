@@ -277,11 +277,11 @@
           displayChatBubble(`Wallet connected! Public Key: ${response.publicKey.toString()}`, 'bot');
         } catch (err) {
           console.error('Connection failed:', err);
-          displayChatBubble('连接钱包失败，请检查是否已安装 Phantom 钱包插件。', 'bot');
+          displayChatBubble('Connection failed, check if the Phantom wallet programme is installed.', 'bot');
         }
       } else {
         console.warn('Phantom Wallet is not installed!');
-        displayChatBubble('请安装 Phantom 钱包插件。', 'bot');
+        displayChatBubble('Please use the Phantom Wallet extension on Google Chrome for PC or the browser within the Phantom Wallet app for mobile to bind your wallet.', 'bot');
       }
     }
 
