@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatGPT 聊天与艺术作品生成</title>
+  <title>ORIGIN</title>
   <style>
     body {
       margin: 0;
@@ -88,8 +88,8 @@
       border-radius: 15px;
       max-width: 63%;
       word-wrap: break-word;
-      background-color: rgba(255, 255, 255, 0.2); /* 半透明白色 */
-      backdrop-filter: blur(5px); /* 磨砂效果 */
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px); 
     }
 
     .user-message {
@@ -97,11 +97,11 @@
     }
 
     .user-message .chat-bubble {
-      color: #ffffff; /* 用户消息文字为白色 */
+      color: #ffffff; 
     }
 
     .bot-message .chat-bubble {
-      color: #ffffff; /* 机器人消息文字为白色 */
+      color: #ffffff;
     }
 
     #chatInput {
@@ -119,14 +119,12 @@
       padding: 10px 15px;
       margin-top: 10px;
       background: linear-gradient(to right, #00ffcc, #8200ff);
-      color: #fff;
       font-size: 16px;
       border: none;
       border-radius: 20px;
       cursor: pointer;
     }
 
-    /* 链接钱包按钮样式 */
     #connectWalletButton {
       position: fixed;
       top: 15px;
@@ -139,7 +137,7 @@
       border-radius: 20px;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
-      z-index: 1000; /* 确保在页面最前 */
+      z-index: 1000;
     }
 
     #connectWalletButton:hover {
@@ -180,10 +178,10 @@
   </style>
 </head>
 <body>
-  <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+  <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf替换白皮书" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
     <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo2.png" alt="Top Logo" style="width: 107px; height: 30px;">
   </a>
-  <button id="connectWalletButton">链接钱包</button>
+  <button id="connectWalletButton">Connect Wallet</button>
   <div class="container">
     <div class="logo">
       <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo.gif" alt="Logo">
@@ -211,9 +209,9 @@
     const chatSendButton = document.getElementById('chatSendButton');
     const connectWalletButton = document.getElementById('connectWalletButton');
 
-    const OPENAI_API_KEY = 'sk-svcacct-CJ447E6feVx7S9Bqe4wnI7QtLuNjEdc_cNnB-OWKSD5fQ50T_rOQ7g0ZvJZlsT3BlbkFJfAs_FnR6vTtjYhwKRaj5Ps2kaQM86iNkkkFcXFscqbCsYhnSVJusqiacFMYAA'; // 替换为你的 API Key
-    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png'; // 用户头像
-    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png'; // AI 头像
+    const OPENAI_API_KEY = 'sk-svcacct-CJ447E6feVx7S9Bqe4wnI7QtLuNjEdc_cNnB-OWKSD5fQ50T_rOQ7g0ZvJZlsT3BlbkFJfAs_FnR6vTtjYhwKRaj5Ps2kaQM86iNkkkFcXFscqbCsYhnSVJusqiacFMYAA';
+    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png'; 
+    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png'; 
 
     async function sendChatMessage(message) {
       displayChatBubble(message, 'user');
@@ -226,7 +224,7 @@
             'Authorization': `Bearer ${OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4',
+            model: 'gpt-4o-mini',
             messages: [
               { role: 'system', content: 'You are a helpful assistant.' },
               { role: 'user', content: message },
@@ -235,11 +233,11 @@
         });
 
         const data = await response.json();
-        const botResponse = data.choices[0].message.content || '抱歉，发生了错误。';
+        const botResponse = data.choices[0].message.content || 
 
         displayChatBubble(botResponse, 'bot');
       } catch (err) {
-        displayChatBubble('发生错误，无法生成回复。', 'bot');
+        displayChatBubble('An error occurred. Please try again.', 'bot');
         console.error(err);
       }
     }
@@ -280,7 +278,7 @@
     });
 
     connectWalletButton.addEventListener('click', () => {
-      displayChatBubble('我目前是测试版，正式版更新后可以绑定钱包支付 $ORGD 用来生成图像与文件，我目前可以免费为你提供文字服务。', 'bot');
+      displayChatBubble('Sorry, I am currently in the beta version and can provide free text and chat services for you. In the official version, you will be able to link your wallet and pay $ORGD to generate images and files.', 'bot');
     });
   </script>
 </body>
