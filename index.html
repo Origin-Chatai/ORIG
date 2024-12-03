@@ -259,26 +259,46 @@
 
     // Wallet connection logic
 async function connectWallet() {
-  // 检查是否存在 Phantom 钱包的深度链接协议
-  const phantomUrl = "phantom://connect"; // Phantom 钱包的深度链接
-
   if (window.solana && window.solana.isPhantom) {
     try {
-      // 触发 Phantom 钱包连接
+      console.log('请求连接 Phantom 钱包');
       const response = await window.solana.connect();
       const walletAddress = response.publicKey.toString();
-      displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
-      connectToAPI(walletAddress);
+      console.log('钱包连接成功！地址:', walletAddress);
+
+      // 连接成功后，调用签名功能
+      requestSignature(walletAddress);
     } catch (err) {
+      console.log('连接钱包失败：', err);
       displayChatBubble('钱包连接失败，请确保Phantom钱包已安装并启用。', 'bot');
-      console.error('连接钱包失败：', err);
     }
   } else {
-    // 使用深度链接引导用户到钱包应用进行连接
-    window.location.href = phantomUrl;
-    setTimeout(() => {
-      displayChatBubble('未检测到Phantom钱包，请安装Phantom钱包并重试。', 'bot');
-    }, 2000);
+    displayChatBubble('未检测到Phantom钱包，请安装Phantom钱包并重试。', 'bot');
+  }
+}
+async function requestSignature(walletAddress) {
+  try {
+    const transaction = new solanaWeb3.Transaction();
+    
+    // 创建一个假交易（例如：将 SOL 转账给自己，或者任何其他交易）
+    // 请根据需要调整这部分代码
+    transaction.add(
+      solanaWeb3.SystemProgram.transfer({
+        fromPubkey: walletAddress,
+        toPubkey: walletAddress,  // 将 SOL 转回给自己作为示例
+        lamports: 1000,
+      })
+    );
+
+    const signedTransaction = await window.solana.signTransaction(transaction);
+    console.log('签名完成:', signedTransaction);
+
+    // 发送交易到区块链网络
+    // await connection.sendRawTransaction(signedTransaction.serialize());
+    displayChatBubble('签名已完成并发送交易！', 'bot');
+  } catch (err) {
+    console.error('签名操作失败:', err);
+    displayChatBubble('签名请求失败，请重试。', 'bot');
   }
 }
 
