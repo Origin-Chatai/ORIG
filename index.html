@@ -258,30 +258,36 @@
     }
 
 async function connectWallet() {
+  // 检测 Phantom 钱包是否存在
   if (window.solana && window.solana.isPhantom) {
     try {
-      // 尝试连接钱包
+      // 提示用户连接钱包
+      displayChatBubble('正在连接 Phantom 钱包...', 'bot');
+
+      // 请求连接钱包
       const response = await window.solana.connect();
-      walletAddress = response.publicKey.toString();
+      walletAddress = response.publicKey.toString(); // 获取钱包地址
       isWalletConnected = true;
       displayChatBubble('连接成功！钱包地址: ' + walletAddress, 'bot');
     } catch (err) {
+      // 捕获连接错误并提示用户
       displayChatBubble('连接失败，请确保 Phantom 钱包已安装并允许连接。', 'bot');
       console.error(err);
     }
   } else {
-    // 如果用户未安装 Phantom 钱包，提示安装
+    // 提示用户安装 Phantom 钱包
     displayChatBubble('请安装 Phantom 钱包，并手动打开。', 'bot');
-    // 提供 Phantom 钱包的链接
     window.location.href = "https://phantom.app/download";
   }
 }
 
 connectWalletButton.addEventListener('click', () => {
   if (!isWalletConnected) {
+    // 如果钱包未连接，尝试连接
     displayChatBubble('请连接钱包以继续。', 'bot');
     connectWallet();
   } else {
+    // 如果钱包已连接，提示已连接
     displayChatBubble('钱包已连接，您可以开始发送消息。', 'bot');
   }
 });
