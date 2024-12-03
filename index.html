@@ -270,27 +270,41 @@
       return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     }
 
-    // 钱包连接功能
-    connectWalletButton.addEventListener('click', async () => {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          if (isMobile()) {
-            // 在移动端触发 Phantom 钱包深度链接
-            window.location.href = "https://phantom.app/ul/connect";
-          } else {
-            const response = await window.solana.connect();
-            walletAddress = response.publicKey.toString(); // 获取钱包地址
+// 钱包连接功能
+connectWalletButton.addEventListener('click', async () => {
+  if (window.solana && window.solana.isPhantom) {
+    try {
+      if (isMobile()) {
+        // 在移动端触发 Phantom 钱包深度链接
+        const url = "https://phantom.app/ul/connect";
+        window.location.href = url; // 打开 Phantom 钱包应用
+        setTimeout(async () => {
+          try {
+            // 等待 Phantom 钱包应用启动并返回签名请求
+            const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+            const publicKey = await window.solana.connect();  // 请求钱包连接
+            walletAddress = publicKey.toString(); // 获取钱包地址
             walletConnected = true; // 标记钱包已连接
             displayChatBubble(`钱包已连接，地址: ${walletAddress}`, 'bot');
+          } catch (err) {
+            displayChatBubble('钱包连接失败，请重新尝试。', 'bot');
+            console.error(err);
           }
-        } catch (err) {
-          displayChatBubble('钱包连接失败，请重新尝试。', 'bot');
-          console.error(err);
-        }
+        }, 2000); // 等待 2 秒，确保钱包应用启动
       } else {
-        displayChatBubble('请安装 Phantom 钱包并重新加载页面。', 'bot');
+        const response = await window.solana.connect();
+        walletAddress = response.publicKey.toString(); // 获取钱包地址
+        walletConnected = true; // 标记钱包已连接
+        displayChatBubble(`钱包已连接，地址: ${walletAddress}`, 'bot');
       }
-    });
+    } catch (err) {
+      displayChatBubble('钱包连接失败，请重新尝试。', 'bot');
+      console.error(err);
+    }
+  } else {
+    displayChatBubble('请安装 Phantom 钱包并重新加载页面。', 'bot');
+  }
+});
 
     // 发送消息按钮事件
     chatSendButton.addEventListener('click', () => {
