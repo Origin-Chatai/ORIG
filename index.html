@@ -260,19 +260,27 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    connectWalletButton.addEventListener('click', async () => {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const response = await window.solana.connect();
-          isWalletConnected = true;
-          displayChatBubble('钱包已连接！', 'bot');
-        } catch (err) {
-          displayChatBubble('连接钱包失败，请重试。', 'bot');
-        }
+connectWalletButton.addEventListener('click', async () => {
+  if (window.solana && window.solana.isPhantom) {
+    try {
+      // 检查是否已连接钱包
+      const walletAddress = await window.solana.connect();
+      if (walletAddress.publicKey) {
+        isWalletConnected = true;
+        displayChatBubble('钱包已连接！', 'bot');
       } else {
-        displayChatBubble('请安装 Phantom 钱包。', 'bot');
+        displayChatBubble('连接钱包失败，请重试。', 'bot');
       }
-    });
+    } catch (err) {
+      // 捕获连接失败的错误
+      displayChatBubble('连接钱包失败，请确保您的 Phantom 钱包已启用并正确连接。', 'bot');
+      console.error('钱包连接错误：', err);
+    }
+  } else {
+    // 提示用户安装 Phantom 钱包
+    displayChatBubble('请安装 Phantom 钱包。', 'bot');
+  }
+});
 
     chatSendButton.addEventListener('click', () => {
       const message = chatInput.value.trim();
