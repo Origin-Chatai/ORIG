@@ -260,7 +260,7 @@
     // Wallet connection logic
 async function connectWallet() {
   // 检查是否存在 Phantom 钱包的深度链接协议
-  const phantomUrl = `phantom://connect?dapp=enrollment&appUrl=https://origin-chatai.github.io/ORIG/`;
+  const phantomUrl = "phantom://connect=https://origin-chatai.github.io/ORIG/"; // Phantom 钱包的深度链接
 
   if (window.solana && window.solana.isPhantom) {
     try {
