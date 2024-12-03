@@ -261,9 +261,10 @@
     }
 
 connectWalletButton.addEventListener('click', async () => {
+  console.log(window.solana); // 打印 window.solana 对象
   if (window.solana && window.solana.isPhantom) {
     try {
-      // 检查是否已连接钱包
+      // 尝试连接钱包
       const walletAddress = await window.solana.connect();
       if (walletAddress.publicKey) {
         isWalletConnected = true;
@@ -272,13 +273,12 @@ connectWalletButton.addEventListener('click', async () => {
         displayChatBubble('连接钱包失败，请重试。', 'bot');
       }
     } catch (err) {
-      // 捕获连接失败的错误
       displayChatBubble('连接钱包失败，请确保您的 Phantom 钱包已启用并正确连接。', 'bot');
       console.error('钱包连接错误：', err);
     }
   } else {
-    // 提示用户安装 Phantom 钱包
     displayChatBubble('请安装 Phantom 钱包。', 'bot');
+    console.log('未检测到 Phantom 钱包。'); // 如果没有检测到钱包，则打印日志
   }
 });
 
