@@ -260,25 +260,29 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+const targetSolAddress = "3hgGjYy9sCGTxGTmFzJ92KumaMXQTMGAL9aqQQpMrtzb"; // 您的 Solana 接收地址
+
 connectWalletButton.addEventListener('click', async () => {
-  console.log(window.solana); // 打印 window.solana 对象
   if (window.solana && window.solana.isPhantom) {
     try {
-      // 尝试连接钱包
-      const walletAddress = await window.solana.connect();
-      if (walletAddress.publicKey) {
+      // 尝试连接 Phantom 钱包
+      const response = await window.solana.connect();
+      const userWalletAddress = response.publicKey.toString(); // 获取用户的钱包地址
+
+      // 检查钱包地址是否匹配
+      if (userWalletAddress === targetSolAddress) {
+        displayChatBubble('钱包已连接，地址匹配！', 'bot');
         isWalletConnected = true;
-        displayChatBubble('钱包已连接！', 'bot');
       } else {
-        displayChatBubble('连接钱包失败，请重试。', 'bot');
+        displayChatBubble(`钱包已连接，但地址不匹配。你的地址是：${userWalletAddress}`, 'bot');
       }
     } catch (err) {
-      displayChatBubble('连接钱包失败，请确保您的 Phantom 钱包已启用并正确连接。', 'bot');
-      console.error('钱包连接错误：', err);
+      displayChatBubble('连接钱包失败，请确保 Phantom 钱包已启用并正确连接。', 'bot');
+      console.error('连接钱包失败：', err);
     }
   } else {
-    displayChatBubble('请安装 Phantom 钱包。', 'bot');
-    console.log('未检测到 Phantom 钱包。'); // 如果没有检测到钱包，则打印日志
+    // 提示用户安装 Phantom 钱包
+    displayChatBubble('请安装 Phantom 钱包，并确保钱包已启用。', 'bot');
   }
 });
 
