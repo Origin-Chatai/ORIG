@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatGPT 聊天与艺术作品生成</title>
+  <title>Origin Ai</title>
   <style>
     body {
       margin: 0;
@@ -88,8 +88,8 @@
       border-radius: 15px;
       max-width: 63%;
       word-wrap: break-word;
-      background-color: rgba(255, 255, 255, 0.2); /* 半透明白色 */
-      backdrop-filter: blur(5px); /* 磨砂效果 */
+      background-color: rgba(255, 255, 255, 0.2); 
+      backdrop-filter: blur(5px);
     }
 
     .user-message {
@@ -97,11 +97,11 @@
     }
 
     .user-message .chat-bubble {
-      color: #ffffff; /* 用户消息文字为白色 */
+      color: #ffffff; 
     }
 
     .bot-message .chat-bubble {
-      color: #ffffff; /* 机器人消息文字为白色 */
+      color: #ffffff;
     }
 
     #chatInput {
@@ -126,7 +126,7 @@
       cursor: pointer;
     }
 
-    /* 链接钱包按钮样式 */
+
     #connectWalletButton {
       position: fixed;
       top: 15px;
@@ -139,7 +139,7 @@
       border-radius: 20px;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
-      z-index: 1000; /* 确保在页面最前 */
+      z-index: 1000;
     }
 
     #connectWalletButton:hover {
@@ -181,12 +181,12 @@
 </head>
 <body>
   <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
-    <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo2.png" alt="Top Logo" style="width: 107px; height: 30px;">
+    <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8990e3.png" alt="Top Logo" style="width: 107px; height: 30px;">
   </a>
-  <button id="connectWalletButton">链接钱包</button>
+  <button id="connectWalletButton">Connect Wallet</button>
   <div class="container">
     <div class="logo">
-      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo.gif" alt="Logo">
+      <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae87452f.gif" alt="Logo">
     </div>
     <div class="chat-container" id="chatContainer"></div>
     <input type="text" id="chatInput" placeholder="Please enter a message..." />
@@ -194,14 +194,14 @@
   </div>
   <div class="bottom-links">
     <a href="https://example.com/page1" target="_blank">
-      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/pump.png" alt="Page 1">
+      <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c10ea.png" alt="Page 1">
     </a>
     <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
-      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/tg.png" alt="Page 2">
+      <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8ce660.png" alt="Page 2">
     </a>
   </div>
   <script>
-    // JavaScript remains unchanged
+
   </script>
 </body>
 
@@ -212,8 +212,8 @@
     const connectWalletButton = document.getElementById('connectWalletButton');
 
     const OPENAI_API_KEY = 'sk-svcacct-CJ447E6feVx7S9Bqe4wnI7QtLuNjEdc_cNnB-OWKSD5fQ50T_rOQ7g0ZvJZlsT3BlbkFJfAs_FnR6vTtjYhwKRaj5Ps2kaQM86iNkkkFcXFscqbCsYhnSVJusqiacFMYAA'; // 替换为你的 API Key
-    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png'; // 用户头像
-    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png'; // AI 头像
+    const userAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c240b.png'; 
+    const botAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f248a7219b.png'; 
 
     async function sendChatMessage(message) {
       displayChatBubble(message, 'user');
@@ -235,7 +235,7 @@
         });
 
         const data = await response.json();
-        const botResponse = data.choices[0].message.content || '抱歉，发生了错误。';
+        const botResponse = data.choices[0].message.content || 'Sorry, there was an error.';
 
         displayChatBubble(botResponse, 'bot');
       } catch (err) {
@@ -274,7 +274,7 @@
           const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
 
           console.log('Signed message:', signedMessage.signature);
-          displayChatBubble(`Wallet connected! Public Key: ${response.publicKey.toString()}`, 'bot');
+          displayChatBubble(`Wallet connected! Your key: ${response.publicKey.toString()}`, 'bot');
         } catch (err) {
           console.error('Connection failed:', err);
           displayChatBubble('Connection failed, check if the Phantom wallet programme is installed.', 'bot');
