@@ -88,8 +88,8 @@
       border-radius: 15px;
       max-width: 63%;
       word-wrap: break-word;
-      background-color: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(5px);
+      background-color: rgba(255, 255, 255, 0.2); /* 半透明白色 */
+      backdrop-filter: blur(5px); /* 磨砂效果 */
     }
 
     .user-message {
@@ -97,11 +97,11 @@
     }
 
     .user-message .chat-bubble {
-      color: #ffffff;
+      color: #ffffff; /* 用户消息文字为白色 */
     }
 
     .bot-message .chat-bubble {
-      color: #ffffff;
+      color: #ffffff; /* 机器人消息文字为白色 */
     }
 
     #chatInput {
@@ -126,6 +126,7 @@
       cursor: pointer;
     }
 
+    /* 链接钱包按钮样式 */
     #connectWalletButton {
       position: fixed;
       top: 15px;
@@ -138,20 +139,66 @@
       border-radius: 20px;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
-      z-index: 1000;
+      z-index: 1000; /* 确保在页面最前 */
     }
 
     #connectWalletButton:hover {
       background: linear-gradient(to right, #feb47b, #ff7e5f);
     }
-  </style>
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 5px auto 15px;
+    }
+
+    .logo img {
+      width: 65px;
+      height: 65px;
+    }
+
+    .bottom-links {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 30px;
+    }
+
+    .bottom-links img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .bottom-links img:hover {
+      transform: scale(1.2);
+    }
+</style>
 </head>
 <body>
+  <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+    <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo2.png" alt="Top Logo" style="width: 107px; height: 30px;">
+  </a>
   <button id="connectWalletButton">链接钱包</button>
   <div class="container">
+    <div class="logo">
+      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo.gif" alt="Logo">
+    </div>
     <div class="chat-container" id="chatContainer"></div>
-    <input type="text" id="chatInput" placeholder="请输入信息..." />
-    <button id="chatSendButton">发送</button>
+    <input type="text" id="chatInput" placeholder="Please enter a message..." />
+    <button id="chatSendButton">SEND</button>
+  </div>
+  <div class="bottom-links">
+    <a href="https://example.com/page1" target="_blank">
+      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/pump.png" alt="Page 1">
+    </a>
+    <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
+      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/tg.png" alt="Page 2">
+    </a>
   </div>
 
   <script>
@@ -160,52 +207,118 @@
     const chatSendButton = document.getElementById('chatSendButton');
     const connectWalletButton = document.getElementById('connectWalletButton');
 
-    async function connectWallet() {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const response = await window.solana.connect();
-          const walletAddress = response.publicKey.toString();
-          displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
-          await requestSignature(walletAddress);
-        } catch (err) {
-          displayChatBubble('连接失败，请重试。', 'bot');
-          console.error('连接失败：', err);
-        }
-      } else {
-        const deepLink = `phantom://connect?app_url=${encodeURIComponent('https://yourapp.com')}&redirect_link=${encodeURIComponent('https://yourapp.com/wallet-connected')}`;
-        window.location.href = deepLink;
-        setTimeout(() => {
-          displayChatBubble('请安装Phantom钱包并重试。', 'bot');
-        }, 2000);
-      }
-    }
+    const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'; // Replace with your API key
+    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png';
+    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png';
 
-    async function requestSignature(walletAddress) {
+    async function sendChatMessage(message) {
+      displayChatBubble(message, 'user');
+      
       try {
-        const message = `请对以下信息签名: 钱包地址: ${walletAddress}`;
-        const encodedMessage = new TextEncoder().encode(message);
-        const signature = await window.solana.signMessage(encodedMessage, 'utf8');
-        displayChatBubble(`签名成功！签名: ${signature.signature}`, 'bot');
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4',
+            messages: [
+              { role: 'system', content: 'You are a helpful assistant.' },
+              { role: 'user', content: message },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        const botResponse = data.choices[0].message.content || '抱歉，发生了错误。';
+
+        displayChatBubble(botResponse, 'bot');
       } catch (err) {
-        displayChatBubble('签名失败，请重试。', 'bot');
-        console.error('签名失败：', err);
+        displayChatBubble('发生错误，无法生成回复。', 'bot');
+        console.error(err);
       }
     }
 
     function displayChatBubble(message, sender) {
       const chatMessage = document.createElement('div');
       chatMessage.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
-
+      
+      const avatar = document.createElement('img');
+      avatar.src = sender === 'user' ? userAvatar : botAvatar;
+      
       const bubble = document.createElement('div');
       bubble.classList.add('chat-bubble');
       bubble.textContent = message;
-
+      
+      chatMessage.appendChild(avatar);
       chatMessage.appendChild(bubble);
       chatContainer.appendChild(chatMessage);
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    // Wallet connection logic
+async function connectWallet() {
+  if (window.solana && window.solana.isPhantom) {
+    try {
+      const response = await window.solana.connect();
+      const walletAddress = response.publicKey.toString();
+      displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
+
+      // 触发签名请求
+      const message = new TextEncoder().encode("请签署此消息以验证您的身份");
+      const signedMessage = await window.solana.signMessage(message);
+      console.log("签名结果:", signedMessage.signature);
+
+      displayChatBubble(`签名成功！签名结果: ${signedMessage.signature}`, 'bot');
+    } catch (err) {
+      displayChatBubble('钱包连接失败，请确保Phantom钱包已安装并启用。', 'bot');
+      console.error('连接钱包失败：', err);
+    }
+  } else {
+    // Phantom 钱包未检测到，提供安装链接
+    window.open('https://phantom.app', '_blank');
+    displayChatBubble('未检测到 Phantom 钱包，请安装并重试。', 'bot');
+  }
+}
+
+    function connectToAPI(walletAddress) {
+      fetch('https://your-api-endpoint.com/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address: walletAddress })
+      })
+      .then(response => response.json())
+      .then(data => {
+        displayChatBubble(`API响应: ${JSON.stringify(data)}`, 'bot');
+      })
+      .catch(err => {
+        displayChatBubble('连接API失败，请稍后再试。', 'bot');
+        console.error(err);
+      });
+    }
+
     connectWalletButton.addEventListener('click', connectWallet);
+
+    chatSendButton.addEventListener('click', () => {
+      const message = chatInput.value.trim();
+      if (message) {
+        sendChatMessage(message);
+        chatInput.value = '';
+      }
+    });
+
+    chatInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        const message = chatInput.value.trim();
+        if (message) {
+          sendChatMessage(message);
+          chatInput.value = '';
+        }
+      }
+    });
   </script>
 </body>
 </html>
