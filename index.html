@@ -176,7 +176,6 @@
 
     .bottom-links img:hover {
       transform: scale(1.2);
-    }
   </style>
 </head>
 <body>
@@ -206,82 +205,105 @@
     const chatSendButton = document.getElementById('chatSendButton');
     const connectWalletButton = document.getElementById('connectWalletButton');
 
-    const OPENAI_API_KEY = 'sk-svcacct-CJ447E6feVx7S9Bqe4wnI7QtLuNjEdc_cNnB-OWKSD5fQ50T_rOQ7g0ZvJZlsT3BlbkFJfAs_FnR6vTtjYhwKRaj5Ps2kaQM86iNkkkFcXFscqbCsYhnSVJusqiacFMYAA'; // 替换为你的 API Key
+    const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'; // 替换为你的 OpenAI API Key
     const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png'; // 用户头像
     const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png'; // AI 头像
-    let isWalletConnected = false;
+    let isWalletConnected = false; // 钱包连接状态
+    let walletAddress = ''; // 用户钱包地址
 
     async function sendChatMessage(message) {
       displayChatBubble(message, 'user');
+      
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4',
+            messages: [
+              { role: 'system', content: 'You are a helpful assistant.' },
+              { role: 'user', content: message },
+            ],
+          }),
+        });
 
-      if (isWalletConnected) {
-        try {
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${OPENAI_API_KEY}`,
-            },
-            body: JSON.stringify({
-              model: 'gpt-4',
-              messages: [
-                { role: 'system', content: 'You are a helpful assistant.' },
-                { role: 'user', content: message },
-              ],
-            }),
-          });
+        const data = await response.json();
+        const botResponse = data.choices[0].message.content || '抱歉，发生了错误。';
 
-          const data = await response.json();
-          const botResponse = data.choices[0].message.content || '抱歉，发生了错误。';
-          displayChatBubble(botResponse, 'bot');
-        } catch (err) {
-          displayChatBubble('发生错误，无法生成回复。', 'bot');
-          console.error(err);
-        }
-      } else {
-        displayChatBubble('请连接 Sol 钱包！', 'bot');
+        displayChatBubble(botResponse, 'bot');
+      } catch (err) {
+        displayChatBubble('发生错误，无法生成回复。', 'bot');
+        console.error(err);
       }
     }
 
     function displayChatBubble(message, sender) {
       const chatMessage = document.createElement('div');
       chatMessage.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
-
+      
       const avatar = document.createElement('img');
       avatar.src = sender === 'user' ? userAvatar : botAvatar;
-
+      
       const bubble = document.createElement('div');
       bubble.classList.add('chat-bubble');
       bubble.textContent = message;
-
+      
       chatMessage.appendChild(avatar);
       chatMessage.appendChild(bubble);
       chatContainer.appendChild(chatMessage);
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-const targetSolAddress = "3hgGjYy9sCGTxGTmFzJ92KumaMXQTMGAL9aqQQpMrtzb"; // 您的 Solana 接收地址
-const connectWalletButton = document.getElementById('connectWalletButton');
-let isWalletConnected = false;
-
-connectWalletButton.addEventListener('click', async () => {
-  if (window.solana && window.solana.isPhantom) {
-    try {
-      // 尝试连接 Phantom 钱包
-      const response = await window.solana.connect();
-      const userWalletAddress = response.publicKey.toString(); // 获取用户的钱包地址
-      displayChatBubble(`钱包已连接，地址是：${userWalletAddress}`, 'bot');
-      isWalletConnected = true;
-
-      // 连接成功后，显示您的钱包地址
-      displayChatBubble(`您可以与我的钱包地址 (${targetSolAddress}) 进行交互。`, 'bot');
-    } catch (err) {
-      displayChatBubble('连接钱包失败，请确保 Phantom 钱包已启用并正确连接。', 'bot');
-      console.error('连接钱包失败：', err);
+    async function connectWallet() {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const response = await window.solana.connect();
+          walletAddress = response.publicKey.toString();
+          isWalletConnected = true;
+          displayChatBubble('连接成功！钱包地址: ' + walletAddress, 'bot');
+        } catch (err) {
+          displayChatBubble('连接失败，请确保 Phantom 钱包已安装并允许连接。', 'bot');
+          console.error(err);
+        }
+      } else {
+        displayChatBubble('请安装 Phantom 钱包并重试。', 'bot');
+      }
     }
-  } else {
-    // 提示用户安装 Phantom 钱包
-    displayChatBubble('请安装 Phantom 钱包，并确保钱包已启用。', 'bot');
-  }
-});
 
+    connectWalletButton.addEventListener('click', () => {
+      if (!isWalletConnected) {
+        displayChatBubble('请连接钱包以继续。', 'bot');
+        connectWallet();
+      } else {
+        displayChatBubble('钱包已连接，您可以开始发送消息。', 'bot');
+      }
+    });
+
+    chatSendButton.addEventListener('click', () => {
+      const message = chatInput.value.trim();
+      if (message && isWalletConnected) {
+        sendChatMessage(message);
+        chatInput.value = '';
+      } else if (!isWalletConnected) {
+        displayChatBubble('请先连接钱包。', 'bot');
+      }
+    });
+
+    chatInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        const message = chatInput.value.trim();
+        if (message && isWalletConnected) {
+          sendChatMessage(message);
+          chatInput.value = '';
+        } else if (!isWalletConnected) {
+          displayChatBubble('请先连接钱包。', 'bot');
+        }
+      }
+    });
+  </script>
+  <script src="https://unpkg.com/@solana/web3.js@1.33.0/dist/web3.min.js"></script>
+</body>
+</html>
