@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChatGPT 聊天与艺术作品生成</title>
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@solana/wallet-adapter-wallets"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@solana/wallet-adapter-base"></script>
   <style>
     body {
       margin: 0;
@@ -31,6 +28,22 @@
       box-shadow: 0 0 20px #00ffcc;
       padding: 20px;
       text-align: center;
+      animation: openAnimation 1.5s ease-out forwards;
+    }
+
+    @keyframes openAnimation {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(0.9);
+        opacity: 0.9;
+      }
     }
 
     .chat-container {
@@ -40,7 +53,21 @@
       text-align: left;
       padding: 0px;
       background: linear-gradient(45deg, rgba(0, 255, 204, 0.3), rgba(0, 204, 255, 0.3), rgba(255, 0, 255, 0.3));
+      background-size: 400% 400%;
+      animation: fluidGradient 6s ease-in-out infinite;
       border-radius: 10px;
+    }
+
+    @keyframes fluidGradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     .chat-message {
@@ -61,8 +88,20 @@
       border-radius: 15px;
       max-width: 63%;
       word-wrap: break-word;
-      background-color: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(5px);
+      background-color: rgba(255, 255, 255, 0.2); /* 半透明白色 */
+      backdrop-filter: blur(5px); /* 磨砂效果 */
+    }
+
+    .user-message {
+      flex-direction: row-reverse;
+    }
+
+    .user-message .chat-bubble {
+      color: #ffffff; /* 用户消息文字为白色 */
+    }
+
+    .bot-message .chat-bubble {
+      color: #ffffff; /* 机器人消息文字为白色 */
     }
 
     #chatInput {
@@ -87,7 +126,11 @@
       cursor: pointer;
     }
 
+    /* 链接钱包按钮样式 */
     #connectWalletButton {
+      position: fixed;
+      top: 15px;
+      right: 20px;
       padding: 10px 15px;
       font-size: 14px;
       background: linear-gradient(to right, #00ffcc, #0086ff, #ff00e1);
@@ -95,45 +138,95 @@
       border: none;
       border-radius: 20px;
       cursor: pointer;
-      margin-top: 10px;
+      box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
+      z-index: 1000; /* 确保在页面最前 */
     }
-  </style>
+
+    #connectWalletButton:hover {
+      background: linear-gradient(to right, #feb47b, #ff7e5f);
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 5px auto 15px;
+    }
+
+    .logo img {
+      width: 65px;
+      height: 65px;
+    }
+
+    .bottom-links {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 30px;
+    }
+
+    .bottom-links img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .bottom-links img:hover {
+      transform: scale(1.2);
+    }
+ </style>
 </head>
 <body>
+  <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+    <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo2.png" alt="Top Logo" style="width: 107px; height: 30px;">
+  </a>
+  <button id="connectWalletButton">连接 Solana 钱包</button>
   <div class="container">
+    <div class="logo">
+      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo.gif" alt="Logo">
+    </div>
     <div class="chat-container" id="chatContainer"></div>
-    <input type="text" id="chatInput" placeholder="Please enter a message..." disabled />
+    <input type="text" id="chatInput" placeholder="请先连接钱包..." disabled />
     <button id="chatSendButton" disabled>SEND</button>
-    <button id="connectWalletButton">连接钱包</button>
   </div>
+  <div class="bottom-links">
+    <a href="https://example.com/page1" target="_blank">
+      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/pump.png" alt="Page 1">
+    </a>
+    <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
+      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/tg.png" alt="Page 2">
+    </a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.83.0/lib/index.iife.js"></script>
   <script>
     const chatContainer = document.getElementById('chatContainer');
     const chatInput = document.getElementById('chatInput');
     const chatSendButton = document.getElementById('chatSendButton');
     const connectWalletButton = document.getElementById('connectWalletButton');
 
-    let walletConnected = false;
-    const OPENAI_API_KEY = 'sk-svcacct-CJ447E6feVx7S9Bqe4wnI7QtLuNjEdc_cNnB-OWKSD5fQ50T_rOQ7g0ZvJZlsT3BlbkFJfAs_FnR6vTtjYhwKRaj5Ps2kaQM86iNkkkFcXFscqbCsYhnSVJusqiacFMYAA'; // 替换为您的 API Key
-    const userAvatar = 'https://example.com/user-avatar.png'; // 用户头像
-    const botAvatar = 'https://example.com/bot-avatar.png'; // 机器人头像
+    const OPENAI_API_KEY = 'your-openai-api-key'; // 替换为你的 API Key
+    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png'; // 用户头像
+    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png'; // AI 头像
+    let walletAddress = null; // 保存钱包地址
 
     async function connectWallet() {
       if (window.solana && window.solana.isPhantom) {
         try {
           const response = await window.solana.connect();
-          console.log('Wallet connected:', response.publicKey.toString());
-          walletConnected = true;
+          walletAddress = response.publicKey.toString();
+          displayChatBubble(`钱包连接成功！地址：${walletAddress}`, 'bot');
+          chatInput.placeholder = "请输入消息...";
           chatInput.disabled = false;
           chatSendButton.disabled = false;
-          connectWalletButton.disabled = true;
-          connectWalletButton.textContent = '钱包已连接';
-          displayChatBubble('钱包已连接，你可以向我提问。', 'bot');
         } catch (err) {
-          console.error('Wallet connection failed:', err);
           displayChatBubble('钱包连接失败，请重试。', 'bot');
+          console.error(err);
         }
       } else {
-        displayChatBubble('请安装 Phantom 钱包以继续。', 'bot');
+        displayChatBubble('未检测到 Phantom 钱包，请安装后重试。', 'bot');
       }
     }
 
@@ -183,17 +276,27 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    connectWalletButton.addEventListener('click', () => {
+      connectWallet();
+    });
+
     chatSendButton.addEventListener('click', () => {
       const message = chatInput.value.trim();
-      if (!walletConnected) {
-        displayChatBubble('请先连接钱包！', 'bot');
-      } else if (message) {
+      if (message) {
         sendChatMessage(message);
         chatInput.value = '';
       }
     });
 
-    connectWalletButton.addEventListener('click', connectWallet);
+    chatInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        const message = chatInput.value.trim();
+        if (message) {
+          sendChatMessage(message);
+          chatInput.value = '';
+        }
+      }
+    });
   </script>
 </body>
 </html>
