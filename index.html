@@ -282,38 +282,23 @@ async function connectWallet() {
   }
 }
 
-function connectWallet() {
-  const phantomUrl = "phantom://connect";
-
-  if (window.solana && window.solana.isPhantom) {
-    window.solana.connect()
-      .then((response) => {
-        const walletAddress = response.publicKey.toString();
-        displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
-        connectToAPI(walletAddress);
+    function connectToAPI(walletAddress) {
+      fetch('https://your-api-endpoint.com/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address: walletAddress })
       })
-      .catch((err) => {
-        displayChatBubble('钱包连接失败，请确保Phantom钱包已安装并启用。', 'bot');
+      .then(response => response.json())
+      .then(data => {
+        displayChatBubble(`API响应: ${JSON.stringify(data)}`, 'bot');
+      })
+      .catch(err => {
+        displayChatBubble('连接API失败，请稍后再试。', 'bot');
         console.error(err);
       });
-  } else {
-    // 使用深度链接协议，打开 Phantom 钱包
-    window.open(phantomUrl, '_self');
-  }
-}
-    async function requestSignature() {
-  try {
-    const encodedMessage = new TextEncoder().encode("请签名以确认身份");
-    const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
-    const signature = signedMessage.signature;
-
-    displayChatBubble(`签名成功: ${Buffer.from(signature).toString('hex')}`, 'bot');
-    connectToAPI(signature);
-  } catch (err) {
-    displayChatBubble('签名请求失败，请稍后再试。', 'bot');
-    console.error(err);
-  }
-}
+    }
 
     connectWalletButton.addEventListener('click', connectWallet);
 
