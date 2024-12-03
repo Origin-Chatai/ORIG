@@ -258,30 +258,46 @@
     }
 
 async function connectWallet() {
-  // 检查是否安装 Phantom 钱包
   if (window.solana && window.solana.isPhantom) {
     try {
-      // 提示用户正在连接钱包
-      displayChatBubble('正在连接 Phantom 钱包...', 'bot');
-
-      // 通过 Phantom 钱包的 connect 方法请求连接
+      // 请求连接钱包
       const response = await window.solana.connect();
-      
-      // 如果连接成功，获取钱包地址并显示
       const walletAddress = response.publicKey.toString();
-      isWalletConnected = true;
       displayChatBubble('连接成功！钱包地址: ' + walletAddress, 'bot');
       
+      // 将用户钱包地址发送到后端进行进一步处理
+      sendWalletAddressToServer(walletAddress);
+      
     } catch (err) {
-      // 连接失败时的错误处理
       displayChatBubble('连接失败，请确保 Phantom 钱包已安装并允许连接。', 'bot');
-      console.error(err);
+      console.error('连接错误:', err);
     }
   } else {
-    // 如果 Phantom 钱包没有安装，提醒用户安装
     displayChatBubble('请安装 Phantom 钱包，并手动打开。', 'bot');
-    window.location.href = "https://phantom.app/download";
+    window.location.href = "https://phantom.app/download"; // 引导用户下载
   }
+}
+
+// 向服务器发送用户钱包地址
+function sendWalletAddressToServer(walletAddress) {
+  fetch('/api/connect_wallet', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      walletAddress: walletAddress,
+      // 其他参数，如交易金额等
+    }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('服务器响应:', data);
+    // 根据后台响应进行处理（如展示交易状态等）
+  })
+  .catch(error => {
+    console.error('请求失败:', error);
+  });
 }
 
 connectWalletButton.addEventListener('click', () => {
