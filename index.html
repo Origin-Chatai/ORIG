@@ -177,7 +177,7 @@
     .bottom-links img:hover {
       transform: scale(1.2);
     }
-  </style>
+</style>
 </head>
 <body>
   <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
@@ -265,14 +265,24 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    // 检测用户是否为移动端
+    function isMobile() {
+      return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    }
+
     // 钱包连接功能
     connectWalletButton.addEventListener('click', async () => {
       if (window.solana && window.solana.isPhantom) {
         try {
-          const response = await window.solana.connect();
-          walletAddress = response.publicKey.toString(); // 获取钱包地址
-          walletConnected = true; // 标记钱包已连接
-          displayChatBubble(`钱包已连接，地址: ${walletAddress}`, 'bot');
+          if (isMobile()) {
+            // 在移动端触发 Phantom 钱包深度链接
+            window.location.href = "https://phantom.app/ul/connect";
+          } else {
+            const response = await window.solana.connect();
+            walletAddress = response.publicKey.toString(); // 获取钱包地址
+            walletConnected = true; // 标记钱包已连接
+            displayChatBubble(`钱包已连接，地址: ${walletAddress}`, 'bot');
+          }
         } catch (err) {
           displayChatBubble('钱包连接失败，请重新尝试。', 'bot');
           console.error(err);
@@ -301,22 +311,6 @@
         }
       }
     });
-  </script>
-
-  <script>
-    // 监听 Phantom 钱包的连接状态变化
-    if (window.solana && window.solana.isPhantom) {
-      window.solana.on('connect', (publicKey) => {
-        walletAddress = publicKey.toString();
-        walletConnected = true;
-        displayChatBubble(`钱包已连接，地址: ${walletAddress}`, 'bot');
-      });
-
-      window.solana.on('disconnect', () => {
-        walletConnected = false;
-        displayChatBubble('钱包已断开连接。', 'bot');
-      });
-    }
   </script>
 </body>
 </html>
