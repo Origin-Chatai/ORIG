@@ -177,7 +177,7 @@
     .bottom-links img:hover {
       transform: scale(1.2);
     }
-</style>
+  </style>
 </head>
 <body>
   <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
@@ -200,6 +200,10 @@
       <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/tg.png" alt="Page 2">
     </a>
   </div>
+  <script>
+    // JavaScript remains unchanged
+  </script>
+</body>
 
   <script>
     const chatContainer = document.getElementById('chatContainer');
@@ -207,9 +211,9 @@
     const chatSendButton = document.getElementById('chatSendButton');
     const connectWalletButton = document.getElementById('connectWalletButton');
 
-    const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'; // Replace with your API key
-    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png';
-    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png';
+    const OPENAI_API_KEY = 'sk-svcacct-CJ447E6feVx7S9Bqe4wnI7QtLuNjEdc_cNnB-OWKSD5fQ50T_rOQ7g0ZvJZlsT3BlbkFJfAs_FnR6vTtjYhwKRaj5Ps2kaQM86iNkkkFcXFscqbCsYhnSVJusqiacFMYAA'; // 替换为你的 API Key
+    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png'; // 用户头像
+    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png'; // AI 头像
 
     async function sendChatMessage(message) {
       displayChatBubble(message, 'user');
@@ -257,51 +261,6 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Wallet connection logic
-async function connectWallet() {
-  // 检查是否存在 Phantom 钱包的深度链接协议
-  const phantomUrl = "phantom://connect"; // Phantom 钱包的深度链接
-
-  if (window.solana && window.solana.isPhantom) {
-    try {
-      // 触发 Phantom 钱包连接
-      const response = await window.solana.connect();
-      const walletAddress = response.publicKey.toString();
-      displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
-      connectToAPI(walletAddress);
-    } catch (err) {
-      displayChatBubble('钱包连接失败，请确保Phantom钱包已安装并启用。', 'bot');
-      console.error('连接钱包失败：', err);
-    }
-  } else {
-    // 使用深度链接引导用户到钱包应用进行连接
-    window.location.href = phantomUrl;
-    setTimeout(() => {
-      displayChatBubble('未检测到Phantom钱包，请安装Phantom钱包并重试。', 'bot');
-    }, 2000);
-  }
-}
-
-    function connectToAPI(walletAddress) {
-      fetch('https://your-api-endpoint.com/connect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address: walletAddress })
-      })
-      .then(response => response.json())
-      .then(data => {
-        displayChatBubble(`API响应: ${JSON.stringify(data)}`, 'bot');
-      })
-      .catch(err => {
-        displayChatBubble('连接API失败，请稍后再试。', 'bot');
-        console.error(err);
-      });
-    }
-
-    connectWalletButton.addEventListener('click', connectWallet);
-
     chatSendButton.addEventListener('click', () => {
       const message = chatInput.value.trim();
       if (message) {
@@ -318,6 +277,10 @@ async function connectWallet() {
           chatInput.value = '';
         }
       }
+    });
+
+    connectWalletButton.addEventListener('click', () => {
+      displayChatBubble('我目前是测试版，正式版更新后可以绑定钱包支付 $ORGD 用来生成图像与文件，我目前可以免费为你提供文字服务。', 'bot');
     });
   </script>
 </body>
