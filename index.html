@@ -264,11 +264,12 @@ async function connectWallet() {
 
   if (window.solana && window.solana.isPhantom) {
     try {
-      // 触发 Phantom 钱包连接
-      const response = await window.solana.connect();
-      const walletAddress = response.publicKey.toString();
-      displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
-      connectToAPI(walletAddress);
+      // 触发签名请求
+      const message = new TextEncoder().encode("请签署此消息以验证您的身份");
+      const signedMessage = await window.solana.signMessage(message);
+      console.log("签名结果:", signedMessage.signature);
+
+      displayChatBubble(`签名成功！签名结果: ${signedMessage.signature}`, 'bot');
     } catch (err) {
       displayChatBubble('钱包连接失败，请确保Phantom钱包已安装并启用。', 'bot');
       console.error('连接钱包失败：', err);
