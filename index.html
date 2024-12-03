@@ -257,58 +257,52 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Wallet connection logic
-async function connectWallet() {
-  // 检查是否存在 Phantom 钱包的深度链接协议
-  const phantomUrl = "phantom://connect"; // Phantom 钱包的深度链接
+<script>
+    async function connectWallet() {
+        if (window.ethereum) {
+            try {
+                // 请求用户授权连接钱包
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const walletAddress = accounts[0];
 
-  if (window.solana && window.solana.isPhantom) {
-    try {
-      // 触发 Phantom 钱包连接
-      const response = await window.solana.connect();
-      const walletAddress = response.publicKey.toString();
-      displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
-      connectToAPI(walletAddress);
-    } catch (err) {
-      displayChatBubble('钱包连接失败，请确保Phantom钱包已安装并启用。', 'bot');
-      console.error('连接钱包失败：', err);
+                // 请求签名确认钱包地址
+                const message = `请签名以验证您的钱包地址: ${walletAddress}`;
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, walletAddress],
+                });
+
+                displayChatBubble(`钱包连接成功！地址: ${walletAddress}\n签名: ${signature}`, 'bot');
+                connectToAPI(walletAddress, signature);
+            } catch (err) {
+                displayChatBubble('钱包连接失败，请确保Trust Wallet已安装并启用。', 'bot');
+                console.error('连接钱包失败：', err);
+            }
+        } else {
+            displayChatBubble('未检测到钱包扩展程序，请安装Trust Wallet浏览器扩展或使用支持的浏览器。', 'bot');
+        }
     }
-  } else {
-    // 使用深度链接引导用户到钱包应用进行连接
-    window.location.href = phantomUrl;
-    setTimeout(() => {
-      displayChatBubble('未检测到Phantom钱包，请安装Phantom钱包并重试。', 'bot');
-    }, 2000);
-  }
-}
 
-    function connectToAPI(walletAddress) {
-      fetch('https://your-api-endpoint.com/connect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address: walletAddress })
-      })
-      .then(response => response.json())
-      .then(data => {
-        displayChatBubble(`API响应: ${JSON.stringify(data)}`, 'bot');
-      })
-      .catch(err => {
-        displayChatBubble('连接API失败，请稍后再试。', 'bot');
-        console.error(err);
-      });
+    function connectToAPI(walletAddress, signature) {
+        fetch('https://your-api-endpoint.com/connect', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ address: walletAddress, signature: signature }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            displayChatBubble(`API响应: ${JSON.stringify(data)}`, 'bot');
+        })
+        .catch(err => {
+            displayChatBubble('连接API失败，请稍后再试。', 'bot');
+            console.error(err);
+        });
     }
 
     connectWalletButton.addEventListener('click', connectWallet);
-
-    chatSendButton.addEventListener('click', () => {
-      const message = chatInput.value.trim();
-      if (message) {
-        sendChatMessage(message);
-        chatInput.value = '';
-      }
-    });
+</script>
 
     chatInput.addEventListener('keypress', (event) => {
       if (event.key === 'Enter') {
