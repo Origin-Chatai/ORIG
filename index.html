@@ -180,139 +180,59 @@
 </style>
 </head>
 <body>
-  <a href="file:///Users/shihongwei/Downloads/ORIGINS.pdf" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
-    <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo2.png" alt="Top Logo" style="width: 107px; height: 30px;">
-  </a>
   <button id="connectWalletButton">链接钱包</button>
   <div class="container">
-    <div class="logo">
-      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/logo.gif" alt="Logo">
-    </div>
     <div class="chat-container" id="chatContainer"></div>
-    <input type="text" id="chatInput" placeholder="Please enter a message..." />
-    <button id="chatSendButton">SEND</button>
-  </div>
-  <div class="bottom-links">
-    <a href="https://example.com/page1" target="_blank">
-      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/pump.png" alt="Page 1">
-    </a>
-    <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
-      <img src="https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/tg.png" alt="Page 2">
-    </a>
+    <input type="text" id="chatInput" placeholder="请输入消息..." />
+    <button id="chatSendButton">发送</button>
   </div>
 
   <script>
     const chatContainer = document.getElementById('chatContainer');
-    const chatInput = document.getElementById('chatInput');
-    const chatSendButton = document.getElementById('chatSendButton');
     const connectWalletButton = document.getElementById('connectWalletButton');
 
-    const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'; // Replace with your API key
-    const userAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/you.png';
-    const botAvatar = 'https://raw.githubusercontent.com/pxart/px.github.io/refs/heads/main/ai.png';
-
-    async function sendChatMessage(message) {
-      displayChatBubble(message, 'user');
-      
-      try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: 'gpt-4',
-            messages: [
-              { role: 'system', content: 'You are a helpful assistant.' },
-              { role: 'user', content: message },
-            ],
-          }),
-        });
-
-        const data = await response.json();
-        const botResponse = data.choices[0].message.content || '抱歉，发生了错误。';
-
-        displayChatBubble(botResponse, 'bot');
-      } catch (err) {
-        displayChatBubble('发生错误，无法生成回复。', 'bot');
-        console.error(err);
-      }
-    }
-
+    // 显示消息气泡
     function displayChatBubble(message, sender) {
       const chatMessage = document.createElement('div');
       chatMessage.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
-      
-      const avatar = document.createElement('img');
-      avatar.src = sender === 'user' ? userAvatar : botAvatar;
       
       const bubble = document.createElement('div');
       bubble.classList.add('chat-bubble');
       bubble.textContent = message;
       
-      chatMessage.appendChild(avatar);
       chatMessage.appendChild(bubble);
       chatContainer.appendChild(chatMessage);
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-<script>
-    async function connectWallet() {
-        if (window.ethereum) {
-            try {
-                // 请求用户授权连接钱包
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const walletAddress = accounts[0];
+    // Trust Wallet连接逻辑
+    async function connectTrustWallet() {
+      if (window.ethereum) {
+        try {
+          // 请求用户连接钱包
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          const walletAddress = accounts[0];
+          
+          displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
 
-                // 请求签名确认钱包地址
-                const message = `请签名以验证您的钱包地址: ${walletAddress}`;
-                const signature = await window.ethereum.request({
-                    method: 'personal_sign',
-                    params: [message, walletAddress],
-                });
+          // 发起签名请求
+          const message = `请签名以确认地址: ${walletAddress}`;
+          const signature = await ethereum.request({
+            method: 'personal_sign',
+            params: [message, walletAddress],
+          });
 
-                displayChatBubble(`钱包连接成功！地址: ${walletAddress}\n签名: ${signature}`, 'bot');
-                connectToAPI(walletAddress, signature);
-            } catch (err) {
-                displayChatBubble('钱包连接失败，请确保Trust Wallet已安装并启用。', 'bot');
-                console.error('连接钱包失败：', err);
-            }
-        } else {
-            displayChatBubble('未检测到钱包扩展程序，请安装Trust Wallet浏览器扩展或使用支持的浏览器。', 'bot');
+          displayChatBubble(`签名成功！签名内容: ${signature}`, 'bot');
+        } catch (err) {
+          displayChatBubble('钱包连接或签名失败。', 'bot');
+          console.error('错误：', err);
         }
-    }
-
-    function connectToAPI(walletAddress, signature) {
-        fetch('https://your-api-endpoint.com/connect', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ address: walletAddress, signature: signature }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            displayChatBubble(`API响应: ${JSON.stringify(data)}`, 'bot');
-        })
-        .catch(err => {
-            displayChatBubble('连接API失败，请稍后再试。', 'bot');
-            console.error(err);
-        });
-    }
-
-    connectWalletButton.addEventListener('click', connectWallet);
-</script>
-
-    chatInput.addEventListener('keypress', (event) => {
-      if (event.key === 'Enter') {
-        const message = chatInput.value.trim();
-        if (message) {
-          sendChatMessage(message);
-          chatInput.value = '';
-        }
+      } else {
+        displayChatBubble('未检测到钱包，请安装Trust Wallet或启用以太坊支持。', 'bot');
       }
-    });
+    }
+
+    connectWalletButton.addEventListener('click', connectTrustWallet);
   </script>
 </body>
 </html>
