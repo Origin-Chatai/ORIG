@@ -259,26 +259,26 @@
 
     // Wallet connection logic
 async function connectWallet() {
+  // 检查是否存在 Phantom 钱包的深度链接协议
+  const phantomUrl = `phantom://connect?dapp=enrollment&appUrl=https://origin-chatai.github.io/ORIG/`;
+
   if (window.solana && window.solana.isPhantom) {
     try {
+      // 触发 Phantom 钱包连接
       const response = await window.solana.connect();
       const walletAddress = response.publicKey.toString();
       displayChatBubble(`钱包连接成功！地址: ${walletAddress}`, 'bot');
-
-      // 触发签名请求
-      const message = new TextEncoder().encode("请签署此消息以验证您的身份");
-      const signedMessage = await window.solana.signMessage(message);
-      console.log("签名结果:", signedMessage.signature);
-
-      displayChatBubble(`签名成功！签名结果: ${signedMessage.signature}`, 'bot');
+      connectToAPI(walletAddress);
     } catch (err) {
       displayChatBubble('钱包连接失败，请确保Phantom钱包已安装并启用。', 'bot');
       console.error('连接钱包失败：', err);
     }
   } else {
-    // Phantom 钱包未检测到，提供安装链接
-    window.open('https://phantom.app', '_blank');
-    displayChatBubble('未检测到 Phantom 钱包，请安装并重试。', 'bot');
+    // 使用深度链接引导用户到钱包应用进行连接
+    window.location.href = phantomUrl;
+    setTimeout(() => {
+      displayChatBubble('未检测到Phantom钱包，请安装Phantom钱包并重试。', 'bot');
+    }, 2000);
   }
 }
 
