@@ -193,7 +193,7 @@
     <button id="chatSendButton">SEND</button>
   </div>
   <div class="bottom-links">
-    <a href="https://example.com/page1" target="_blank">
+    <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
       <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c10ea.png" alt="Page 1">
     </a>
     <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
@@ -226,7 +226,7 @@
             'Authorization': `Bearer ${OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4',
+            model: 'gpt-4o-mini',
             messages: [
               { role: 'system', content: 'You are a helpful assistant.' },
               { role: 'user', content: message },
@@ -239,7 +239,7 @@
 
         displayChatBubble(botResponse, 'bot');
       } catch (err) {
-        displayChatBubble('发生错误，无法生成回复。', 'bot');
+        displayChatBubble('An error occurred and a reply could not be generated.', 'bot');
         console.error(err);
       }
     }
@@ -264,11 +264,9 @@
     async function connectToPhantomWallet() {
       if (window.solana && window.solana.isPhantom) {
         try {
-          // 发起连接请求
           const response = await window.solana.connect();
           console.log('Wallet connected:', response.publicKey.toString());
 
-          // 构造签名请求
           const message = "Please sign this message to verify your identity.";
           const encodedMessage = new TextEncoder().encode(message);
           const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
