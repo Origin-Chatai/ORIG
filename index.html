@@ -258,12 +258,12 @@
       });
 
       const data = await response.json();
-      const botResponse = data.choices[0].message.content || '抱歉，发生错误。';
+      const botResponse = data.choices[0].message.content || 'Sorry, there was an error, please refresh and try again.';
 
       displayChatBubble(botResponse, 'bot');
       replyCount++; 
     } catch (err) {
-      displayChatBubble('发生错误，无法生成回复。', 'bot');
+      displayChatBubble('An error occurred and a response could not be generated. Please retry using a PC browser.', 'bot');
       console.error(err);
     }
   }
@@ -291,15 +291,15 @@
         const response = await window.solana.connect();
         console.log('Wallet connected:', response.publicKey.toString());
 
-        const message = "请签名此消息以验证身份。";
+        const message = "Please sign this message with your wallet to verify your identity.";
         const encodedMessage = new TextEncoder().encode(message);
         const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
 
-        console.log('签名消息:', signedMessage.signature);
+        console.log('signedMessage', signedMessage.signature);
         walletConnected = true;
-        displayChatBubble(`钱包已连接！您的公钥: ${response.publicKey.toString()}`, 'bot');
+        displayChatBubble(`Wallet is connected!: ${response.publicKey.toString()}`, 'bot');
       } catch (err) {
-        console.error('连接失败:', err);
+        console.error('Connection failed.', err);
         displayChatBubble('连接失败，请确认是否安装了Phantom钱包。', 'bot');
       }
     } else {
