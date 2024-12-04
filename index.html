@@ -300,11 +300,11 @@
         displayChatBubble(`Wallet is connected!: ${response.publicKey.toString()}`, 'bot');
       } catch (err) {
         console.error('Connection failed.', err);
-        displayChatBubble('连接失败，请确认是否安装了Phantom钱包。', 'bot');
+        displayChatBubble('Connection failed, make sure Phantom Wallet is installed.', 'bot');
       }
     } else {
-      console.warn('Phantom Wallet未安装！');
-      displayChatBubble('请使用Google Chrome上的Phantom Wallet插件或Phantom App内浏览器绑定钱包。', 'bot');
+      console.warn('Phantom Wallet is not installed!');
+      displayChatBubble('Please use the Phantom Wallet extension for Google Chrome to bind the wallet.', 'bot');
     }
   }
 
@@ -330,7 +330,6 @@
     }
   });
 
-  // 初始化时加载API密钥
   loadApiKey();
 </script>
 </body>
