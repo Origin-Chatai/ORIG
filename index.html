@@ -230,7 +230,7 @@
   }
 
   async function sendChatMessage(message) {
-    if (replyCount >= 10 && !walletConnected) {
+    if (replyCount >= 20 && !walletConnected) {
       displayChatBubble('Please connect your Phantom wallet to continue using OrigAi.', 'bot');
       return;
     }
