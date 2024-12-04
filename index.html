@@ -211,32 +211,32 @@
   const chatSendButton = document.getElementById('chatSendButton');
   const connectWalletButton = document.getElementById('connectWalletButton');
 
-  let OPENAI_API_KEY = ''; // 将通过 fetch 动态加载
+  let OPENAI_API_KEY = '';
   const userAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c240b.png'; 
   const botAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f248a7219b.png'; 
   let replyCount = 0; 
   let walletConnected = false; 
 
-  // 1. 动态加载API密钥
+  //
   async function loadApiKey() {
     try {
       const response = await fetch('/config.json');
       const config = await response.json();
       OPENAI_API_KEY = config.OPENAI_API_KEY;
     } catch (error) {
-      console.error('加载API密钥失败:', error);
-      displayChatBubble('无法加载API密钥，请联系管理员。', 'bot');
+      console.error('Failed to establish communication, please refresh and retry!', error);
+      displayChatBubble('Unable to establish communication, please contact Orign.', 'bot');
     }
   }
 
   async function sendChatMessage(message) {
     if (replyCount >= 10 && !walletConnected) {
-      displayChatBubble('请连接钱包后继续使用聊天功能。', 'bot');
+      displayChatBubble('Please connect your Phantom wallet to continue using OrigAi.', 'bot');
       return;
     }
 
     if (replyCount === 0) {
-      displayChatBubble('请稍等，正在建立通信...', 'bot');
+      displayChatBubble('Please wait while communications are established with OrigAi...', 'bot');
     }
 
     displayChatBubble(message, 'user');
