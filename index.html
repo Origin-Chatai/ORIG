@@ -177,7 +177,7 @@
     .bottom-links img:hover {
       transform: scale(1.2);
     }
-</style>
+  </style>
 </head>
 <body>
   <a href="https://krseoul.imgtbl.com/i/2024/12/05/67513e7c7104c.jpg" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
@@ -201,155 +201,136 @@
     </a>
   </div>
   <script>
-    const chatContainer = document.getElementById('chatContainer');
-    const chatInput = document.getElementById('chatInput');
-    const chatSendButton = document.getElementById('chatSendButton');
-    const connectWalletButton = document.getElementById('connectWalletButton');
 
-    const userAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c240b.png'; 
-    const botAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f248a7219b.png'; 
-    let OPENAI_API_KEY = '';
-    let walletConnected = false;
-    let replyCount = 0;
+  </script>
+</body>
 
-    // 图片生成函数
-    async function generateImage(prompt) {
-      // 模拟生成图像逻辑（可替换为实际生成 API）
-      return `https://via.placeholder.com/512x512.png?text=${encodeURIComponent(prompt)}`;
+<script>
+  const chatContainer = document.getElementById('chatContainer');
+  const chatInput = document.getElementById('chatInput');
+  const chatSendButton = document.getElementById('chatSendButton');
+  const connectWalletButton = document.getElementById('connectWalletButton');
+
+  let OPENAI_API_KEY = '';
+  const userAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c240b.png'; 
+  const botAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f248a7219b.png'; 
+  let replyCount = 0; 
+  let walletConnected = false; 
+
+  //
+  async function loadApiKey() {
+    try {
+      const response = await fetch('/config.json');
+      const config = await response.json();
+      OPENAI_API_KEY = config.OPENAI_API_KEY;
+    } catch (error) {
+      console.error('Failed to establish communication, please refresh and retry!', error);
+      displayChatBubble('Unable to establish communication, please contact Orign.', 'bot');
+    }
+  }
+
+  async function sendChatMessage(message) {
+    if (replyCount >= 15 && !walletConnected) {
+      displayChatBubble('Please connect your Phantom wallet to continue using OrigAi.', 'bot');
+      return;
     }
 
-    // 显示聊天气泡
-    function displayChatBubble(message, sender, isImage = false) {
-      const chatMessage = document.createElement('div');
-      chatMessage.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
-
-      const avatar = document.createElement('img');
-      avatar.src = sender === 'user' ? userAvatar : botAvatar;
-
-      const bubble = document.createElement('div');
-      bubble.classList.add('chat-bubble');
-
-      if (isImage) {
-        const image = document.createElement('img');
-        image.src = message;
-        image.alt = "Generated Image";
-        image.style.maxWidth = "100%";
-        image.style.borderRadius = "10px";
-        bubble.appendChild(image);
-      } else {
-        bubble.textContent = message;
-      }
-
-      chatMessage.appendChild(avatar);
-      chatMessage.appendChild(bubble);
-      chatContainer.appendChild(chatMessage);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+    if (replyCount === 0) {
+      displayChatBubble('Please wait while communications are established with OrigAi...', 'bot');
     }
 
-    // 加载 API Key
-    async function loadApiKey() {
+    displayChatBubble(message, 'user');
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant.' },
+            { role: 'user', content: message },
+          ],
+        }),
+      });
+
+      const data = await response.json();
+      const botResponse = data.choices[0].message.content || 'Sorry, there was an error, please refresh and try again.';
+
+      displayChatBubble(botResponse, 'bot');
+      replyCount++; 
+    } catch (err) {
+      displayChatBubble('An error occurred and a response could not be generated. Please check the network connection or try again using a PC browser.', 'bot');
+      console.error(err);
+    }
+  }
+
+  function displayChatBubble(message, sender) {
+    const chatMessage = document.createElement('div');
+    chatMessage.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
+    
+    const avatar = document.createElement('img');
+    avatar.src = sender === 'user' ? userAvatar : botAvatar;
+    
+    const bubble = document.createElement('div');
+    bubble.classList.add('chat-bubble');
+    bubble.textContent = message;
+    
+    chatMessage.appendChild(avatar);
+    chatMessage.appendChild(bubble);
+    chatContainer.appendChild(chatMessage);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  async function connectToPhantomWallet() {
+    if (window.solana && window.solana.isPhantom) {
       try {
-        const response = await fetch('/config.json');
-        const config = await response.json();
-        OPENAI_API_KEY = config.OPENAI_API_KEY;
-      } catch (error) {
-        console.error('Failed to establish communication, please refresh and retry!', error);
-        displayChatBubble('Unable to establish communication, please contact Orign.', 'bot');
+        const response = await window.solana.connect();
+        console.log('Wallet connected:', response.publicKey.toString());
+
+        const message = "Please sign this message with your wallet to verify your identity.";
+        const encodedMessage = new TextEncoder().encode(message);
+        const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
+
+        console.log('signedMessage', signedMessage.signature);
+        walletConnected = true;
+        displayChatBubble(`Wallet is connected!: ${response.publicKey.toString()}`, 'bot');
+      } catch (err) {
+        console.error('Connection failed.', err);
+        displayChatBubble('Connection failed, make sure Phantom Wallet is installed.', 'bot');
       }
+    } else {
+      console.warn('Phantom Wallet is not installed!');
+      displayChatBubble('Please use the Phantom Wallet extension for Google Chrome to bind the wallet.', 'bot');
     }
+  }
 
-    // 发送聊天消息
-    async function sendChatMessage(message) {
-      if (replyCount >= 15 && !walletConnected) {
-        displayChatBubble('Please connect your Phantom wallet to continue using OrigAi.', 'bot');
-        return;
-      }
+  connectWalletButton.addEventListener('click', () => {
+    connectToPhantomWallet();
+  });
 
-      if (replyCount === 0) {
-        displayChatBubble('Please wait while communications are established with OrigAi...', 'bot');
-      }
-
-      displayChatBubble(message, 'user');
-
-      if (message.toLowerCase().includes('生成图片')) {
-        const prompt = message.replace(/生成图片/g, '').trim();
-        const imageUrl = await generateImage(prompt || '默认图片');
-        displayChatBubble(imageUrl, 'bot', true); // 回复图片
-      } else {
-        try {
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${OPENAI_API_KEY}`,
-            },
-            body: JSON.stringify({
-              model: 'gpt-4o-mini',
-              messages: [
-                { role: 'system', content: 'You are a helpful assistant.' },
-                { role: 'user', content: message },
-              ],
-            }),
-          });
-
-          const data = await response.json();
-          const botResponse = data.choices[0].message.content || 'Sorry, there was an error, please refresh and try again.';
-          displayChatBubble(botResponse, 'bot');
-          replyCount++;
-        } catch (err) {
-          displayChatBubble('An error occurred and a response could not be generated. Please check the network connection or try again using a PC browser.', 'bot');
-          console.error(err);
-        }
-      }
+  chatSendButton.addEventListener('click', () => {
+    const message = chatInput.value.trim();
+    if (message) {
+      sendChatMessage(message);
+      chatInput.value = '';
     }
+  });
 
-    // 连接 Phantom Wallet
-    async function connectToPhantomWallet() {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const response = await window.solana.connect();
-          console.log('Wallet connected:', response.publicKey.toString());
-
-          const message = "Please sign this message with your wallet to verify your identity.";
-          const encodedMessage = new TextEncoder().encode(message);
-          const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
-
-          console.log('signedMessage', signedMessage.signature);
-          walletConnected = true;
-          displayChatBubble(`Wallet is connected!: ${response.publicKey.toString()}`, 'bot');
-        } catch (err) {
-          console.error('Connection failed.', err);
-          displayChatBubble('Connection failed, make sure Phantom Wallet is installed.', 'bot');
-        }
-      } else {
-        console.warn('Phantom Wallet is not installed!');
-        displayChatBubble('Please use the Phantom Wallet extension for Google Chrome to bind the wallet.', 'bot');
-      }
-    }
-
-    connectWalletButton.addEventListener('click', () => {
-      connectToPhantomWallet();
-    });
-
-    chatSendButton.addEventListener('click', () => {
+  chatInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
       const message = chatInput.value.trim();
       if (message) {
         sendChatMessage(message);
         chatInput.value = '';
       }
-    });
+    }
+  });
 
-    chatInput.addEventListener('keypress', (event) => {
-      if (event.key === 'Enter') {
-        const message = chatInput.value.trim();
-        if (message) {
-          sendChatMessage(message);
-          chatInput.value = '';
-        }
-      }
-    });
-
-    loadApiKey();
-  </script>
+  loadApiKey();
+</script>
 </body>
 </html>
