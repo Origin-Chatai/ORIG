@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Origin Ai</title>
+  <title>O ChatAI</title>
   <style>
     body {
       margin: 0;
@@ -198,18 +198,18 @@
       OPENAI_API_KEY = config.OPENAI_API_KEY;
     } catch (error) {
       console.error('Failed to establish communication, please refresh and retry!', error);
-      displayChatBubble('Unable to establish communication, please contact Orign.', 'bot');
+      displayChatBubble('Unable to establish communication, please contact O ChatAI.', 'bot');
     }
   }
 
   async function sendChatMessage(message) {
     if (replyCount >= 15 && !walletConnected) {
-      displayChatBubble('Please connect your Phantom wallet to continue using O—ChatAI.', 'bot');
+      displayChatBubble('Please connect your Phantom wallet to continue using O ChatAI.', 'bot');
       return;
     }
 
     if (replyCount === 0) {
-      displayChatBubble('O—ChatAI CA：xxxxxxxxxxxxxxx', 'bot');
+      displayChatBubble('O ChatAI CA：xxxxxxxxxxxxxxx', 'bot');
     }
 
     displayChatBubble(message, 'user');
