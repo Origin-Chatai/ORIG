@@ -1,3 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Origin Ai</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #00ffcc;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      margin: 30px auto 0;
+      width: 100%;
+      max-width: 700px;
+      background: rgba(10, 10, 10, 0.9);
+      border: 0.5px solid #00ffcc;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #00ffcc;
+      padding: 20px;
+      text-align: center;
+      animation: openAnimation 1.5s ease-out forwards;
+    }
+
+    @keyframes openAnimation {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(0.9);
+        opacity: 0.9;
+      }
+    }
+
+    .chat-container {
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: left;
+      padding: 0px;
+      background: linear-gradient(45deg, rgba(0, 255, 204, 0.3), rgba(0, 204, 255, 0.3), rgba(255, 0, 255, 0.3));
+      background-size: 400% 400%;
+      animation: fluidGradient 6s ease-in-out infinite;
+      border-radius: 10px;
+    }
+
+    @keyframes fluidGradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .chat-message {
+      display: flex;
+      margin: 10px 0;
+      align-items: flex-end;
+    }
+
+    .chat-message img {
+      width: 36px;
+      height: 36px;
+      margin: 0 10px;
+    }
+
+    .chat-bubble {
+      display: inline-block;
+      padding: 7px;
+      border-radius: 15px;
+      max-width: 63%;
+      word-wrap: break-word;
+      background-color: rgba(255, 255, 255, 0.2); 
+      backdrop-filter: blur(5px);
+    }
+
+    .user-message {
+      flex-direction: row-reverse;
+    }
+
+    .user-message .chat-bubble {
+      color: #ffffff; 
+    }
+
+    .bot-message .chat-bubble {
+      color: #ffffff;
+    }
+
+    #chatInput {
+      width: 80%;
+      font-size: 16px;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #00ffcc;
+      border-radius: 12px;
+      background: #222;
+      color: #fff;
+    }
+
+    #chatSendButton {
+      padding: 10px 15px;
+      margin-top: 10px;
+      background: linear-gradient(to right, #00ffcc, #8200ff);
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+
+    #connectWalletButton {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      padding: 10px 15px;
+      font-size: 14px;
+      background: linear-gradient(to right, #00ffcc, #0086ff, #ff00e1);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
+      z-index: 1000;
+    }
+
+    #connectWalletButton:hover {
+      background: linear-gradient(to right, #feb47b, #ff7e5f);
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 5px auto 15px;
+    }
+
+    .logo img {
+      width: 65px;
+      height: 65px;
+    }
+
+    .bottom-links {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 30px;
+    }
+
+    .bottom-links img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .bottom-links img:hover {
+      transform: scale(1.2);
+    }
   </style>
 </head>
 <body>
