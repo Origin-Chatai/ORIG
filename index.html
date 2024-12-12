@@ -217,7 +217,7 @@
   const chatSendButton = document.getElementById('chatSendButton');
   const connectWalletButton = document.getElementById('connectWalletButton');
 
-  let OPENAI_API_KEY = '';
+  let OPENAI_API_KEY = ''; // 将通过 fetch 动态加载
   const userAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c240b.png'; 
   const botAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f248a7219b.png'; 
   let replyCount = 0; 
@@ -264,12 +264,12 @@
       });
 
       const data = await response.json();
-      const botResponse = data.choices[0].message.content || 'Sorry, there was an error, please refresh and try again.';
+      const botResponse = data.choices[0].message.content || '抱歉，发生错误。';
 
       displayChatBubble(botResponse, 'bot');
       replyCount++; 
     } catch (err) {
-      displayChatBubble('An error occurred and a response could not be generated. Please retry using a PC browser.', 'bot');
+      displayChatBubble('发生错误，无法生成回复。', 'bot');
       console.error(err);
     }
   }
@@ -297,20 +297,20 @@
         const response = await window.solana.connect();
         console.log('Wallet connected:', response.publicKey.toString());
 
-        const message = "Please sign this message with your wallet to verify your identity.";
+        const message = "请签名此消息以验证身份。";
         const encodedMessage = new TextEncoder().encode(message);
         const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
 
-        console.log('signedMessage', signedMessage.signature);
+        console.log('签名消息:', signedMessage.signature);
         walletConnected = true;
-        displayChatBubble(`Wallet is connected!: ${response.publicKey.toString()}`, 'bot');
+        displayChatBubble(`钱包已连接！您的公钥: ${response.publicKey.toString()}`, 'bot');
       } catch (err) {
-        console.error('Connection failed.', err);
-        displayChatBubble('Connection failed, make sure Phantom Wallet is installed.', 'bot');
+        console.error('连接失败:', err);
+        displayChatBubble('连接失败，请确认是否安装了Phantom钱包。', 'bot');
       }
     } else {
-      console.warn('Phantom Wallet is not installed!');
-      displayChatBubble('Please use the Phantom Wallet extension for Google Chrome to bind the wallet.', 'bot');
+      console.warn('Phantom Wallet未安装！');
+      displayChatBubble('请使用Google Chrome上的Phantom Wallet插件或Phantom App内浏览器绑定钱包。', 'bot');
     }
   }
 
@@ -336,6 +336,7 @@
     }
   });
 
+  // 初始化时加载API密钥
   loadApiKey();
 </script>
 </body>
