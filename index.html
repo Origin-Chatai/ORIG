@@ -231,18 +231,18 @@
       OPENAI_API_KEY = config.OPENAI_API_KEY;
     } catch (error) {
       console.error('Failed to establish communication, please refresh and retry!', error);
-      displayChatBubble('Unable to establish communication, please contact Orign.', 'bot');
+      displayChatBubble('Welcome to the Web3AI Assistant, where you can ask any private questions and our dialogue will be encrypted.', 'bot');
     }
   }
 
   async function sendChatMessage(message) {
-    if (replyCount >= 15 && !walletConnected) {
-      displayChatBubble('Please connect your Phantom wallet to continue using OrigAi.', 'bot');
+    if (replyCount >= 10 && !walletConnected) {
+      displayChatBubble('To protect your privacy and security, please connect the Phantom wallet to continue the dialogue.', 'bot');
       return;
     }
 
     if (replyCount === 0) {
-      displayChatBubble('Please wait while communications are established with OrigAi...', 'bot');
+      displayChatBubble('Please wait, @AI is setting up communications...', 'bot');
     }
 
     displayChatBubble(message, 'user');
