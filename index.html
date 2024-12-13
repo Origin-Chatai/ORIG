@@ -4,14 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Origin Ai</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&family=Exo+2:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle, #0a0a0a, #000);
-      color: #00fff6;
-      font-family: 'Orbitron', sans-serif;
+      background-color: #000;
+      color: #00ffcc;
+      font-family: 'Arial', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,132 +19,126 @@
     }
 
     .container {
-      margin: 0 auto;
-      width: 80%;
-      height: 500px;
-      max-width: 800px;
-      background: rgba(0, 0, 0, 0);
-      border: 0.5px solid #00ff2a;
+      margin: 30px auto 0;
+      width: 100%;
+      max-width: 700px;
+      background: rgba(10, 10, 10, 0.9);
+      border: 0.5px solid #00ffcc;
       border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 42, 0.5), 0 0 50px rgba(0, 255, 42, 0.2);
+      box-shadow: 0 0 20px #00ffcc;
       padding: 20px;
       text-align: center;
-      animation: fadeIn 1.5s ease-in-out;
+      animation: openAnimation 1.5s ease-out forwards;
     }
 
-    @keyframes fadeIn {
+    @keyframes openAnimation {
       0% {
+        transform: scale(0);
         opacity: 0;
-        transform: translateY(-20px);
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
       }
       100% {
-        opacity: 1;
-        transform: translateY(0);
+        transform: scale(0.9);
+        opacity: 0.9;
       }
     }
 
     .chat-container {
-      margin-top: 10px;
-      height: 420px;
+      margin-top: 20px;
+      max-height: 300px;
       overflow-y: auto;
       text-align: left;
-      padding: 10px;
-      background: linear-gradient(45deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
-      border-radius: 15px;
-      box-shadow: inset 0 0 15px rgba();
+      padding: 0px;
+      background: linear-gradient(45deg, rgba(0, 255, 204, 0.3), rgba(0, 204, 255, 0.3), rgba(255, 0, 255, 0.3));
+      background-size: 400% 400%;
+      animation: fluidGradient 6s ease-in-out infinite;
+      border-radius: 10px;
+    }
+
+    @keyframes fluidGradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     .chat-message {
       display: flex;
       margin: 10px 0;
-      align-items: center;
-      animation: slideIn 0.5s ease-in-out;
-    }
-
-    @keyframes slideIn {
-      0% {
-        opacity: 0;
-        transform: translateX(50px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
+      align-items: flex-end;
     }
 
     .chat-message img {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       margin: 0 10px;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0);
     }
 
     .chat-bubble {
       display: inline-block;
-      padding: 10px 15px;
-      border-radius: 20px;
-      max-width: 70%;
+      padding: 7px;
+      border-radius: 15px;
+      max-width: 63%;
       word-wrap: break-word;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      color: #00ff00;
-      font-size: 14px;
-      text-shadow: 0 0 5px rgba(0, 0, 0,0);
+      background-color: rgba(255, 255, 255, 0.2); 
+      backdrop-filter: blur(5px);
     }
 
     .user-message {
       flex-direction: row-reverse;
     }
 
-    .chat-input-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
+    .user-message .chat-bubble {
+      color: #ffffff; 
+    }
+
+    .bot-message .chat-bubble {
+      color: #ffffff;
     }
 
     #chatInput {
-      flex: 1;
+      width: 80%;
       font-size: 16px;
       padding: 10px;
-      border: 0.5px solid #00ff2a;
+      margin-top: 10px;
+      border: 1px solid #00ffcc;
       border-radius: 12px;
-      background: #000;
+      background: #222;
       color: #fff;
-      margin-right: 10px;
-      box-shadow: inset 0 0 10px rgba(0, 255, 40, 0.5);
     }
 
     #chatSendButton {
-      padding: 10px 20px;
-      background: linear-gradient(90deg, #00fff6, #005eff);
+      padding: 10px 15px;
+      margin-top: 10px;
+      background: linear-gradient(to right, #00ffcc, #8200ff);
       color: #fff;
       font-size: 16px;
       border: none;
       border-radius: 20px;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(0, 255, 42, 0.7);
-      transition: background 0.3s ease;
     }
 
-    #chatSendButton:hover {
-      background: linear-gradient(90deg, #005eff, #00fff6);
-    }
 
     #connectWalletButton {
       position: fixed;
-      top: 20px;
+      top: 15px;
       right: 20px;
-      padding: 10px 20px;
+      padding: 10px 15px;
       font-size: 14px;
-      background: linear-gradient(to right, #00fff6, #005eff, #ff00e1);
+      background: linear-gradient(to right, #00ffcc, #0086ff, #ff00e1);
       color: #fff;
       border: none;
       border-radius: 20px;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(0, 255, 42, 0.8);
-      transition: background 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
       z-index: 1000;
     }
 
@@ -187,22 +180,23 @@
   </style>
 </head>
 <body>
-  <a href="https://github.com/orig2022/ai.github.io/blob/main/%20Whitepaper.pdf" target="_blank" style="position: fixed; top: 5px; left: 5px; z-index: 1000;">
-    <img src="https://krseoul.imgtbl.com/i/2024/12/13/675b91e8c16d7.png" alt="Top Logo" style="width: 110px; height: 70px;">
+  <a href="https://raw.githubusercontent.com/Origin-Chatai/ORIG/6b5e3e332ce1fba4d60df66c520e6c0f64e77ade/1.svg" target="_blank" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+    <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8990e3.png" alt="Top Logo" style="width: 107px; height: 30px;">
   </a>
   <button id="connectWalletButton">Connect Wallet</button>
-<div class="container">
-  <div class="chat-container" id="chatContainer"></div>
-  <div class="chat-input-container">
+  <div class="container">
+    <div class="logo">
+      <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae87452f.gif" alt="Logo">
+    </div>
+    <div class="chat-container" id="chatContainer"></div>
     <input type="text" id="chatInput" placeholder="Please enter a message..." />
     <button id="chatSendButton">SEND</button>
   </div>
-</div>
   <div class="bottom-links">
-    <a href="https://raw.githubusercontent.com/orig2022/ai.github.io/9b1886966b654d21778c1249063d054bd3c22b18/prompt.svg" target="_blank">
+    <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
       <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c10ea.png" alt="Page 1">
     </a>
-    <a href="https://t.me/+Myc6qWhngSJmMjA1" target="_blank">
+    <a href="https://t.me/+nsJGUiFYqpY5MTdl" target="_blank">
       <img src="https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8ce660.png" alt="Page 2">
     </a>
   </div>
