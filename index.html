@@ -206,29 +206,14 @@
 </body>
 
 <script>
-  const chatContainer = document.getElementById('chatContainer');
-  const chatInput = document.getElementById('chatInput');
-  const chatSendButton = document.getElementById('chatSendButton');
-  const connectWalletButton = document.getElementById('connectWalletButton');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendButton = document.getElementById('chatSendButton');
+    const connectWalletButton = document.getElementById('connectWalletButton');
 
-  let OPENAI_API_KEY = ''; // 将通过 fetch 动态加载
-  const userAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c240b.png'; 
-  const botAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f248a7219b.png'; 
-  let replyCount = 0; 
-  let walletConnected = false; 
-
-  // 1. 动态加载API密钥
-  async function loadApiKey() {
-    try {
-      const response = await fetch('/config.json');
-      const config = await response.json();
-      OPENAI_API_KEY = config.OPENAI_API_KEY;
-    } catch (error) {
-      console.error('加载API密钥失败:', error);
-      displayChatBubble('无法加载API密钥，请联系管理员。', 'bot');
-    }
-  }
-
+    const OPENAI_API_KEY = 'sk-svcacct-pSgS3lDNjbXpPfnApp-yjpuQ5Jq10dFfDU5YpX9LKCy7A-xUsygE7iYPD-u-PjT3BlbkFJ8MIRb5TPu2cpqr0D7mbahDIe6IkZq7GEKwfi4WN8uj-MsfhGR8DFn1dXzcYzkA'; // 替换为你的 API Key
+    const userAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f1ae8c240b.png'; 
+    const botAvatar = 'https://krseoul.imgtbl.com/i/2024/12/03/674f248a7219b.png'; 
   async function sendChatMessage(message) {
     if (replyCount >= 10 && !walletConnected) {
       displayChatBubble('请连接钱包后继续使用聊天功能。', 'bot');
